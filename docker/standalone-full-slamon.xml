@@ -1,5 +1,10 @@
 <?xml version='1.0' encoding='UTF-8'?>
-
+<!--
+  CUSTOM MODIFCATIONS FOR jBPM Workbench
+  ***************************************
+  - THIS FILE IS COPIED FROM DIRECTORY "wildfly-8.1.0.Final/standalone/configuration/standalone-full.xml" from "wildfly-8.1.0.Final.zip"
+  - THE CUSTOM MODIFICATIONS ON THIS FILE IN THIS IMAGE ARE MARKED WITH THE COMMENT'S TEXT "jBPM Workbench"
+-->
 <server xmlns="urn:jboss:domain:2.1">
     <extensions>
         <extension module="org.jboss.as.clustering.infinispan"/>
@@ -29,6 +34,19 @@
         <extension module="org.wildfly.extension.io"/>
         <extension module="org.wildfly.extension.undertow"/>
     </extensions>
+
+  <!-- jBPM Workbench - ENABLED EXAMPLE -->
+    <system-properties>
+      <property name="org.kie.example" value="${org.kie.example:false}"/>
+      <property name="org.kie.demo" value="${org.kie.demo:false}"/>
+
+      <property name="org.jbpm.designer.perspective" value="${org.jbpm.designer.perspective:full}"/>
+      <property name="designerdataobjects" value="${designerdataobjects:false}"/>
+      <!-- Make GIT repositories available from outside localhost. -->
+
+      <property name="org.uberfire.nio.git.ssh.host" value="0.0.0.0"/>
+    </system-properties>
+  
     <management>
         <security-realms>
             <security-realm name="ManagementRealm">
@@ -40,15 +58,16 @@
                     <properties path="mgmt-groups.properties" relative-to="jboss.server.config.dir"/>
                 </authorization>
             </security-realm>
+            <!-- jBPM Workbench - CUSTOM PROPERTY FILES FOR AUTHENTICATION / AUTHZ -->
             <security-realm name="ApplicationRealm">
-                <authentication>
-                    <local default-user="$local" allowed-users="*" skip-group-loading="true"/>
-                    <properties path="jbpm-users.properties" relative-to="jboss.server.config.dir"/>
-                </authentication>
-                <authorization>
-                    <properties path="jbpm-roles.properties" relative-to="jboss.server.config.dir"/>
-                </authorization>
-            </security-realm>
+              <authentication>
+                <local default-user="$local" allowed-users="*" skip-group-loading="true"/>
+                <properties path="jbpm-users.properties" relative-to="jboss.server.config.dir"/>
+              </authentication>
+              <authorization>
+                <properties path="jbpm-roles.properties" relative-to="jboss.server.config.dir"/>
+              </authorization>
+          </security-realm>
         </security-realms>
         <audit-log>
             <formatters>
@@ -383,12 +402,13 @@
         <subsystem xmlns="urn:jboss:domain:security:1.2">
             <security-domains>
                 <security-domain name="other" cache-type="default">
-                    <authentication>
-                        <login-module code="UsersRoles" flag="required">
-                            <module-option name="usersProperties" value="${jboss.server.config.dir}/jbpm-users.properties"/>
-                            <module-option name="rolesProperties" value="${jboss.server.config.dir}/jbpm-roles.properties"/>
-                        </login-module>
-                    </authentication>
+                  <authentication>
+                    <!-- jBPM Workbench - CUSTOM LOGIN MODULE -->
+                    <login-module code="UsersRoles" flag="required">
+                      <module-option name="usersProperties" value="${jboss.server.config.dir}/jbpm-users.properties"/>
+                      <module-option name="rolesProperties" value="${jboss.server.config.dir}/jbpm-roles.properties"/>
+                    </login-module>
+                  </authentication>
                 </security-domain>
                 <security-domain name="jboss-web-policy" cache-type="default">
                     <authorization>
@@ -418,6 +438,8 @@
                     <location name="/" handler="welcome-content"/>
                     <filter-ref name="server-header"/>
                     <filter-ref name="x-powered-by-header"/>
+                    <!-- jBPM Workbench - Add SSO between local applications (jbpm workbench and jbpm dashbuilder). -->
+                    <single-sign-on path="/"/>
                 </host>
             </server>
             <servlet-container name="default">

@@ -1,30 +1,28 @@
-FROM jboss/jbpm-workbench:latest
+FROM jboss/jbpm-workbench:6.2.0.Final
 
 USER root
 
-RUN mkdir /workspace
+# Add sources and config assets
 WORKDIR /workspace
-ADD settings.gradle ./settings.gradle
+ADD settings.gradle build.gradle gradlew LICENSE ./
 ADD gradle/ ./gradle/
-ADD gradlew ./gradlew
-ADD LICENSE ./LICENSE
-ADD etc/ ./etc/
 ADD src/ ./src/
-ADD build.gradle ./build.gradle
-RUN chown -R jboss:jboss /workspace
+ADD docker/ ./docker/
 
-USER jboss
-RUN ./gradlew uploadArchives
-RUN cp -nav /workspace/build/libs/* $JBOSS_HOME/standalone/deployments/jbpm-console.war/WEB-INF/lib/
+# Build WorkItemHandler and deploy dependencies
+RUN ./gradlew getDepsCompile jar \
+    && cp -nav /workspace/build/libs/* $JBOSS_HOME/standalone/deployments/jbpm-console.war/WEB-INF/lib/ \
+    &&  rm -rf /root/.gradle /workspace/.gradle
 
-# jBPM Custom Configuration files
-USER root
-ADD etc/standalone-full-jbpm.xml $JBOSS_HOME/standalone/configuration/standalone-full-jbpm.xml
-ADD etc/jbpm-users.properties $JBOSS_HOME/standalone/configuration/jbpm-users.properties
-ADD etc/jbpm-roles.properties $JBOSS_HOME/standalone/configuration/jbpm-roles.properties
-RUN chown jboss:jboss $JBOSS_HOME/standalone/configuration/*
+# Add jBPM Custom Configuration files and inject SLAMon handlers to default templates
+RUN cp docker/standalone-full-slamon.xml docker/jbpm-users.properties docker/jbpm-roles.properties $JBOSS_HOME/standalone/configuration/ \
+    && cp docker/WorkDefinitions.wid docker/kie-wb-deployment-descriptor.xml $JBOSS_HOME/standalone/deployments/jbpm-console.war/WEB-INF/classes/META-INF/
+
+# designer backend needs write access to update assets
+RUN chown jboss:jboss $JBOSS_HOME/standalone/configuration/* \
+    && chown -R jboss:jboss $JBOSS_HOME/standalone/deployments/jbpm-console.war/org.kie.workbench.KIEWebapp/stencilsets
 
 # Run jBPM
 USER jboss
 WORKDIR $JBOSS_HOME/bin/
-CMD ["./standalone.sh", "-b", "0.0.0.0", "--server-config=standalone-full-jbpm.xml"]
+CMD ["./standalone.sh", "-b", "0.0.0.0", "--server-config=standalone-full-slamon.xml"]

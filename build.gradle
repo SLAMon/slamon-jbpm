@@ -11,14 +11,10 @@ test {
     testLogging {
         events "passed", "skipped", "failed", "standardOut", "standardError"
     }
-    outputs.upToDateWhen { false } 
+    outputs.upToDateWhen { false }
 }
 
 repositories {
-    flatDir {
-        name 'jbpm'
-        dirs '/opt/jboss/wildfly/standalone/deployments/jbpm-console.war/WEB-INF/lib/'
-    }
     jcenter()
     mavenCentral()
     maven {
@@ -35,14 +31,17 @@ dependencies {
     testCompile 'org.hamcrest:hamcrest-core:1.3'
 }
 
-task copyDependencyLibs(type: Copy) {
+task getDepsCompile(type: Copy) {
     from configurations.compile
     into "$buildDir/libs"
 }
 
-uploadArchives {
-    dependsOn "copyDependencyLibs"
-    repositories {
-        add project.repositories.jbpm
-    }
+task getDepsTest(type: Copy) {
+    from configurations.testCompile
+    into "$buildDir/libs"
+}
+
+task getDeps {
+    dependsOn "getDepsCompile"
+    dependsOn "getDepsTest"
 }
