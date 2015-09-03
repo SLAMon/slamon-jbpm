@@ -1,0 +1,54 @@
+import org.drools.core.process.core.datatype.impl.type.StringDataType;
+import org.drools.core.process.core.datatype.impl.type.IntegerDataType;
+import org.drools.core.process.core.datatype.impl.type.FloatDataType;
+
+[
+  [
+    "name" : "SLAMon",
+    "parameters" : [
+      "task_type" : new StringDataType(),
+      "task_version" : new IntegerDataType()
+    ],
+    "category": "SLAMon",
+    "displayName" : "SLAMon",
+    "icon" : "defaultservicenodeicon.png"
+  ],
+  [
+    "name" : "SLAMon_wait",
+    "parameters" : [
+      "time" : new IntegerDataType()
+    ],
+    "results" [
+      "time" : new FloatDataType()
+    ],
+    "category": "SLAMon",
+    "displayName" : "Wait",
+    "icon" : "defaultservicenodeicon.png"
+  ],
+  [
+    "name" : "SLAMon_http",
+    "parameters" : [
+      "url" : new StringDataType()
+    ],
+    "results" [
+      "status" : new IntegerDataType()
+    ],
+    "category": "SLAMon",
+    "displayName" : "HTTP Status",
+    "icon" : "defaultservicenodeicon.png"
+  ],
+  [
+    "name" : "SLAMon_push",
+    "parameters" : [
+      "variant_id" : new StringDataType(),
+      "alert" : new StringDataType(),
+      "sound" : new StringDataType()
+    ],
+    "results" : [
+      "result" : new StringDataType()
+    ],
+    "category": "SLAMon",
+    "displayName" : "Push Notification",
+    "icon" : "defaultservicenodeicon.png"
+  ]
+]
