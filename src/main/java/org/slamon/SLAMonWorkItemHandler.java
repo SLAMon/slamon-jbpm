@@ -82,7 +82,7 @@ public class SLAMonWorkItemHandler implements WorkItemHandler {
             Object value = Util.convertFromJBPM(e.getValue());
             task.task_data.put(e.getKey(), value);
             log.log(
-                    Level.INFO,
+                    Level.FINER,
                     "Adding parameter {0} for task {1}, value: {2}, type: {3}",
                     new Object[]{e.getKey(), task.task_id, value.toString(), value.getClass().getCanonicalName()}
             );
@@ -113,7 +113,7 @@ public class SLAMonWorkItemHandler implements WorkItemHandler {
                         try {
                             Object value = e.getValue();
                             log.log(
-                                    Level.INFO,
+                                    Level.FINER,
                                     "Adding OUTPUT parameter {0} for task {1}, value: {2}, type: {3}",
                                     new Object[]{e.getKey(), task.task_id, value.toString(), value.getClass().getCanonicalName()}
                             );
