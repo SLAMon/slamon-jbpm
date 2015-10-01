@@ -118,6 +118,7 @@ public class AfmTest {
     @Before
     public void ressetAfm() {
         Afm.resetAll();
+        Afm.setPollInterval(1);
     }
 
     @Test
