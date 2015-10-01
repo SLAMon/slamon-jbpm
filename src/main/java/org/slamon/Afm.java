@@ -61,6 +61,7 @@ public class Afm {
     }
 
     private Afm(String url) {
+        log.log(Level.INFO, "Creating a new AFM client instance for {0}", url);
         mUrl = url;
     }
 

@@ -122,6 +122,16 @@ public class AfmTest {
     }
 
     @Test
+    public void testSharedInstance() throws InterruptedException, ExecutionException, TimeoutException {
+        Afm afm1 = Afm.get(HttpTesting.SIMPLE_URL);
+        Afm afm2 = Afm.get(HttpTesting.SIMPLE_URL);
+        Afm afm3 = Afm.get(HttpTesting.SIMPLE_URL+"test/");
+
+        assertSame(afm1,afm2);
+        assertNotSame(afm2, afm3);
+    }
+
+    @Test
     public void testSuccessResult() throws InterruptedException, ExecutionException, TimeoutException {
 
         Afm afm = Afm.get(HttpTesting.SIMPLE_URL);
