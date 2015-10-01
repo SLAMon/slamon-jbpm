@@ -31,6 +31,7 @@ public class Afm {
 
     static final HashMap<String, Afm> sAfmServers = new HashMap<String, Afm>();
     static final JsonFactory sJsonFactory = new GsonFactory();
+    static long sPollInterval = Long.parseLong(System.getProperty("slamon.afm.polling", "15"));
 
     final ScheduledExecutorService mExecutor = Executors.newSingleThreadScheduledExecutor();
     final HashMap<String, ResultCallback> mTasks = new HashMap<String, ResultCallback>();
@@ -42,6 +43,10 @@ public class Afm {
         public void initialize(HttpRequest request) throws IOException {
             request.setParser(new JsonObjectParser(sJsonFactory));
         }
+    }
+
+    public static void setPollInterval(long pollInterval) {
+        sPollInterval = pollInterval;
     }
 
     /**
@@ -56,6 +61,7 @@ public class Afm {
     }
 
     private Afm(String url) {
+        log.log(Level.INFO, "Creating a new AFM client instance for {0}", url);
         mUrl = url;
     }
 
@@ -228,7 +234,7 @@ public class Afm {
                             getTask(responseUrl, task);
                         }
                     }
-                }, 1000, TimeUnit.MILLISECONDS);
+                }, sPollInterval, TimeUnit.SECONDS);
             }
         }
     }

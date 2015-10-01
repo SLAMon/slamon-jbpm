@@ -105,6 +105,13 @@ SLAMon_push | `new org.slamon.SLAMonJupsHandler(JBOSS_UNIFIED_PUSH_SERVER_URL, A
 SLAMon      | `new org.slamon.SLAMonWorkItemHandler(AGENT_FLEET_MANAGER_URL)`  generic SLAMon task with task type and version specified in the process
 SLAMon_task | `new org.slamon.SLAMonWorkItemHandler(AGENT_FLEET_MANAGER_URL, TASK_HANDLER_NAME, TASK_HANDLER_VERSION)` handler with task type and version already bound for convenience
 
+It's also possible to define AFM Url as a java system property named `slamon.afm.url`. In this case the AFM Url can be
+omitted in the work item handler definition by using the two parameter constructor instead, e.g.
+`new org.slamon.SLAMonWorkItemHandler("my_handler", 3)`.
+
+The default interval for pollings task results from AFM is 15 seconds. This may be altered by setting `slamon.afm.polling`
+system property. The value is set to amount of seconds between polling requests.
+
 ###### Parameters for SLAMonJupsHandler:
 
 Parameter      | Description

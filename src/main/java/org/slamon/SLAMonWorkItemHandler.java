@@ -27,16 +27,36 @@ public class SLAMonWorkItemHandler implements WorkItemHandler {
     /**
      * Construct SLAMonWorkItemHandler with specific AFM URL.
      */
-    public SLAMonWorkItemHandler(String url) {
+    public SLAMonWorkItemHandler(String url) throws Exception {
         mUrl = url;
+        if (mUrl == null) {
+            throw new Exception("No AFM URL provided for SLAMonWorkItemHandler");
+        }
+    }
+
+    /**
+     * Construct SLAMonWorkItemHandler with system AFM URL.
+     */
+    public SLAMonWorkItemHandler() throws Exception {
+        this(System.getProperty("slamon.afm.url"));
     }
 
     /**
      * Convenience overload to predefine task type and
      * task version so that these can be omitted in work item parameters.
      */
-    public SLAMonWorkItemHandler(String url, String taskType, int taskVersion) {
-        mUrl = url;
+    public SLAMonWorkItemHandler(String taskType, int taskVersion) throws Exception {
+        this();
+        mTaskType = taskType;
+        mTaskVersion = taskVersion;
+    }
+
+    /**
+     * Convenience overload to predefine task type and
+     * task version so that these can be omitted in work item parameters.
+     */
+    public SLAMonWorkItemHandler(String url, String taskType, int taskVersion) throws Exception {
+        this(url);
         mTaskType = taskType;
         mTaskVersion = taskVersion;
     }
