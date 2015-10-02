@@ -145,11 +145,11 @@ public class SLAMonWorkItemHandler implements WorkItemHandler {
                     mItemIdMap.remove(localWorkItemId);
                 }
 
-                Map<String, Object> results = new HashMap<String, Object>();
-                results.put("task_error", task.task_error);
+                log.log(Level.SEVERE, "A task returned as failed, aborting task {0}. Error: {1}", new Object[]{
+                        task.task_id, task.task_error});
 
                 try (EngineHolder engine = new EngineHolder(deploymentId)) {
-                    engine.getEngine().getKieSession().getWorkItemManager().completeWorkItem(workItem.getId(), results);
+                    engine.getEngine().getKieSession().getWorkItemManager().abortWorkItem(workItem.getId());
                 }
             }
         });
