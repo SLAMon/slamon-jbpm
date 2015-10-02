@@ -83,18 +83,12 @@ public class SLAMonWorkItemHandler implements WorkItemHandler {
 
         final String deploymentId = ((WorkItemImpl) workItem).getDeploymentId();
 
-        EngineHolder engine = null;
-        try {
-            engine = new EngineHolder(deploymentId);
+        try (EngineHolder engine = new EngineHolder(deploymentId)) {
             task = new Task(
                     Util.itemId(engine.getEngine(), workItem),
                     Util.processId(engine.getEngine(), workItem),
                     taskType,
                     taskVersion);
-        } finally {
-            if (engine != null) {
-                engine.close();
-            }
         }
 
         task.task_data = new HashMap<String, Object>();
@@ -124,9 +118,7 @@ public class SLAMonWorkItemHandler implements WorkItemHandler {
                     mItemIdMap.remove(localWorkItemId);
                 }
 
-                //try (EngineHolder engine = new EngineHolder(deploymentId)) {
-                EngineHolder engine = null;
-                try {
+                try (EngineHolder engine = new EngineHolder(deploymentId)) {
 
                     HashMap<String, Object> results = new HashMap<String, Object>();
                     for (Map.Entry<String, Object> e : task.task_result.entrySet()) {
@@ -142,12 +134,7 @@ public class SLAMonWorkItemHandler implements WorkItemHandler {
                             log.log(Level.SEVERE, "Error during output variable conversions: {0}", e2.getMessage());
                         }
                     }
-                    engine = new EngineHolder(deploymentId);
                     engine.getEngine().getKieSession().getWorkItemManager().completeWorkItem(workItem.getId(), results);
-                } finally {
-                    if (engine != null) {
-                        engine.close();
-                    }
                 }
             }
 
@@ -161,15 +148,8 @@ public class SLAMonWorkItemHandler implements WorkItemHandler {
                 Map<String, Object> results = new HashMap<String, Object>();
                 results.put("task_error", task.task_error);
 
-                //try (EngineHolder engine = new EngineHolder(deploymentId)) {
-                EngineHolder engine = null;
-                try {
-                    engine = new EngineHolder(deploymentId);
+                try (EngineHolder engine = new EngineHolder(deploymentId)) {
                     engine.getEngine().getKieSession().getWorkItemManager().completeWorkItem(workItem.getId(), results);
-                } finally {
-                    if (engine != null) {
-                        engine.close();
-                    }
                 }
             }
         });

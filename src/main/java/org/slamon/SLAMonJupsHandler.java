@@ -51,14 +51,8 @@ public class SLAMonJupsHandler implements WorkItemHandler {
 
         final String deploymentId = ((WorkItemImpl) workItem).getDeploymentId();
 
-        EngineHolder engine = null;
-        try {
-            engine = new EngineHolder(deploymentId);
+        try (EngineHolder engine = new EngineHolder(deploymentId)) {
             testId = Util.processId(engine.getEngine(), workItem);
-        } finally {
-            if (engine != null) {
-                engine.close();
-            }
         }
 
         PushNotification notification;
