@@ -170,7 +170,6 @@ public class StatsdProcessEventListener implements ProcessEventListener {
             // send stats
             mClient.recordGaugeValue("process.running", mRunningProcesses.size());
             mClient.recordGaugeValue(createMetricName(event, "running"), mTotalProcesses.dec(event));
-            mClient.incrementCounter(metricName);
             mClient.recordExecutionTimeToNow(metricName, processStartTime);
         }
     }

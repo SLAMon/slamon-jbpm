@@ -104,8 +104,6 @@ public class StatsdProcessEventListenerTest {
 
         verify(mMockClient, times(2)).incrementCounter("process.TestProcess2.started");
         verify(mMockClient, times(1)).incrementCounter("process.AnotherTestProcess1.started");
-        verify(mMockClient).incrementCounter("process.TestProcess2.completed");
-        verify(mMockClient).incrementCounter("process.TestProcess2.aborted");
     }
 
     @Test
