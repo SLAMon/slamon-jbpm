@@ -204,11 +204,8 @@ This can be overridden with _category_ definition in the work item definitions.
 #### SLAMonWorkItemHandler
 
 Each SLAMon task type is represented by a separate custom work item in jBPM.
-
 The DataInput of each custom work item corresponds to the input data parameter of the equivalent SLAMon task handler.
-
 Likewise, the DataOutput of each custom work item corresponds to the response data return by the equivalent SLAMon task handler.
-
 Please refer the readme files of the SLAMon Agent and the corresponding task types that you are going to use for more details.
 
 
@@ -223,14 +220,44 @@ SLAMon Push Notification accepts the following DataInput:
   * sound - the sound that will be played on the receiving devices
 
 Take note that a copy of the notification will always be sent to the variant id defined in the Work Item Handler registration. For example, this can be the variant ID used by the service operation center.
-
 A notification can also be sent to all devices. To do this, use "all" instead of specifying a specific variant_id.
-
 If you do not have a specific sound to play, please use "default".
 
 SLAMon Push Notification returns the following DataOutput:
 
   * result - either "successful" or "failed"
+
+### Publishing statistics to StatsD with StatsdProcessEventListener
+
+The slamon-jbpm package includes an *ProcessEventListener* implementation to send statistics of
+started, completed and aborted processes to a StatsD server.
+
+StatsdProcessEventListener will record
+
+  * gauge values for number of running projects, for both total and per process definition (slamon.bpms.<process>.running)
+  * counters for started processes per process definition (slamon.bpms.<process>.started)
+  * timers for completed and aborted processes per process definition  (slamon.bpms.<process>.completed and  slamon.bpms.<process>.aborted)
+
+Enable StatsD stats reporting by adding an entry in the project deployment descriptor with
+value = `new org.slamon.StatsdProcessEventListener()` and resolver type = mvel.
+
+#### Configuration
+
+StatsdProcessEventListener may be configured in two ways: constructor parameters and system properties.
+
+Constructors:
+
+```java
+public StatsdProcessEventListener(String prefix, String host, int port) throws Exception
+public StatsdProcessEventListener(String host, int port) throws Exception
+public StatsdProcessEventListener()
+```
+
+Property             | Default     | Description
+-------------------- | ----------- | -------------------
+slamon.statsd.prefix | slamon.bpms | Prefix for StatsD values
+slamon.statsd.host   |             | Hostname of the StatsD server
+slamon.statsd.port   | 8125        | Port of the StatsD server
 
 
 Docker images
