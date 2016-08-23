@@ -106,6 +106,37 @@ public class StatsdProcessEventListenerTest {
         verify(mMockClient, times(1)).incrementCounter("process.AnotherTestProcess1.started");
     }
 
+    /** With persistence enabled, a task previously unknown to event listener may complete. */
+    @Test
+    public void testUnknownEventCompletion() throws Exception {
+        StatsdProcessEventListener listener = new StatsdProcessEventListener(mMockClient);
+
+        ProcessInstance mockInstance1 = mockProcess("Test Process-1");
+        when(mockInstance1.getState()).thenReturn(ProcessInstance.STATE_COMPLETED);
+        // complete event
+        listener.afterProcessCompleted(mockProcessEvent(ProcessCompletedEvent.class, mockInstance1));
+
+
+        verify(mMockClient, never()).recordExecutionTimeToNow(anyString(), anyLong());
+    }
+
+    @Test
+    public void testUnknownState() throws Exception {
+        StatsdProcessEventListener listener = new StatsdProcessEventListener(mMockClient);
+
+        ProcessInstance mockInstance1 = mockProcess("Test Process-2");
+        listener.afterProcessStarted(mockProcessEvent(ProcessStartedEvent.class, mockInstance1));
+
+        // reset counters after start
+        reset(mMockClient);
+
+        when(mockInstance1.getState()).thenReturn(1337);
+        listener.afterProcessCompleted(mockProcessEvent(ProcessCompletedEvent.class, mockInstance1));
+
+        verify(mMockClient, never()).recordExecutionTimeToNow(anyString(), anyLong());
+        verify(mMockClient, never()).recordGaugeValue(anyString(), anyLong());
+    }
+
     @Test
     public void testAfterProcessCompleted() throws Exception {
 

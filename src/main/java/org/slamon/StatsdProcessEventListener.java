@@ -147,7 +147,12 @@ public class StatsdProcessEventListener implements ProcessEventListener {
     public void afterProcessCompleted(ProcessCompletedEvent event) {
         synchronized (mClient) {
             // calculate process duration from stored value
-            long processStartTime = mRunningProcesses.remove(event.getProcessInstance().getId());
+            Long processStartTime = mRunningProcesses.remove(event.getProcessInstance().getId());
+            if (processStartTime == null) {
+                log.log(Level.WARNING, "Unknown process {0} completed with status {1}", new Object[]{
+                        event.getProcessInstance().getId(), event.getProcessInstance().getState()});
+                return;
+            }
 
             // Generate metric name for recording stats
             String metricName;
