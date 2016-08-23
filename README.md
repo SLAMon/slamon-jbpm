@@ -241,6 +241,9 @@ StatsdProcessEventListener will record
 Enable StatsD stats reporting by adding an entry in the project deployment descriptor with
 value = `new org.slamon.StatsdProcessEventListener()` and resolver type = mvel.
 
+**NOTE:** As *StatsdProcessEventListener* currently tracks processes using in memory store, it only works in single node
+setups and can not track persistent processes across restarts.
+
 #### Configuration
 
 StatsdProcessEventListener may be configured in two ways: constructor parameters and system properties.
