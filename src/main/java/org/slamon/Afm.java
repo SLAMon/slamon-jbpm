@@ -31,6 +31,7 @@ public class Afm {
 
     static final HashMap<String, Afm> sAfmServers = new HashMap<String, Afm>();
     static final JsonFactory sJsonFactory = new GsonFactory();
+    static long sPollInterval = Long.parseLong(System.getProperty("slamon.afm.polling", "15"));
 
     final ScheduledExecutorService mExecutor = Executors.newSingleThreadScheduledExecutor();
     final HashMap<String, ResultCallback> mTasks = new HashMap<String, ResultCallback>();
@@ -42,6 +43,10 @@ public class Afm {
         public void initialize(HttpRequest request) throws IOException {
             request.setParser(new JsonObjectParser(sJsonFactory));
         }
+    }
+
+    public static void setPollInterval(long pollInterval) {
+        sPollInterval = pollInterval;
     }
 
     /**
@@ -56,6 +61,7 @@ public class Afm {
     }
 
     private Afm(String url) {
+        log.log(Level.INFO, "Creating a new AFM client instance for {0}", url);
         mUrl = url;
     }
 
@@ -133,7 +139,7 @@ public class Afm {
      * @param taskId id of the task to cancel
      */
     public void abortTask(String taskId) {
-        log.log(Level.INFO, "Removing task {0} from result map.", taskId);
+        log.log(Level.FINE, "Removing task {0} from result map.", taskId);
         synchronized (mTasks) {
             mTasks.remove(taskId);
         }
@@ -149,7 +155,7 @@ public class Afm {
     public void postTask(Task task, ResultCallback callback) {
 
         try {
-            log.log(Level.INFO, "Adding callback for task {0} into result map.", task.task_id);
+            log.log(Level.FINE, "Adding callback for task {0} into result map.", task.task_id);
             synchronized (mTasks) {
                 mTasks.put(task.task_id, callback);
             }
@@ -192,22 +198,22 @@ public class Afm {
     private void getTask(final GenericUrl responseUrl, final Task task) {
         synchronized (mTasks) {
             if (mTasks.containsKey(task.task_id)) {
-                log.log(Level.INFO, "Scheduling result request for task {0}.", task.task_id);
+                log.log(Level.FINE, "Scheduling result request for task {0}.", task.task_id);
                 mExecutor.schedule(new Runnable() {
                     @Override
                     public void run() {
                         try {
 
-                            log.log(Level.INFO, "Requesting results for task {0}...", task.task_id);
+                            log.log(Level.FINE, "Requesting results for task {0}...", task.task_id);
                             HttpRequestFactory factory = mHttpTransport.createRequestFactory(new RequestInitializer());
                             HttpRequest request = factory.buildGetRequest(responseUrl);
                             Task resultTask = request.execute().parseAs(Task.class);
 
                             if (resultTask.task_completed != null || resultTask.task_failed != null) {
-                                log.log(Level.INFO, "Got results for task {0}!", task.task_id);
+                                log.log(Level.INFO, "Received results for task {0}!", task.task_id);
                                 completeTask(resultTask);
                             } else {
-                                log.log(Level.INFO, "Results not yet available for task {0}.", task.task_id);
+                                log.log(Level.FINE, "Results not yet available for task {0}.", task.task_id);
                                 // retry
                                 getTask(responseUrl, task);
                             }
@@ -228,7 +234,7 @@ public class Afm {
                             getTask(responseUrl, task);
                         }
                     }
-                }, 1000, TimeUnit.MILLISECONDS);
+                }, sPollInterval, TimeUnit.SECONDS);
             }
         }
     }
