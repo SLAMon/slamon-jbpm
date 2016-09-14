@@ -100,19 +100,12 @@ public class StatsdProcessEventListener implements ProcessEventListener {
         return name.replaceAll("[^a-zA-Z0-9]", "");
     }
 
-    static private String createProcessName(ProcessInstance process, KieRuntime runtime) {
-        long parentId = process.getParentProcessInstanceId();
-        if (parentId != 0) {
-            return createProcessName(runtime.getProcessInstance(parentId), runtime) + '.' + filterName(process.getProcessName());
-        }
-        return filterName(process.getProcessName());
-    }
-
     private String createMetricName(ProcessEvent event, String suffix) {
+
         synchronized (mClient) {
             mBuilder.setLength(0);
             mBuilder.append("process.")
-                    .append(createProcessName(event.getProcessInstance(), event.getKieRuntime()))
+                    .append(filterName(event.getProcessInstance().getProcessName()))
                     .append('.')
                     .append(suffix);
             return mBuilder.toString();
@@ -147,7 +140,12 @@ public class StatsdProcessEventListener implements ProcessEventListener {
     public void afterProcessCompleted(ProcessCompletedEvent event) {
         synchronized (mClient) {
             // calculate process duration from stored value
-            long processStartTime = mRunningProcesses.remove(event.getProcessInstance().getId());
+            Long processStartTime = mRunningProcesses.remove(event.getProcessInstance().getId());
+            if (processStartTime == null) {
+                log.log(Level.WARNING, "Unknown process {0} completed with status {1}", new Object[]{
+                        event.getProcessInstance().getId(), event.getProcessInstance().getState()});
+                return;
+            }
 
             // Generate metric name for recording stats
             String metricName;
