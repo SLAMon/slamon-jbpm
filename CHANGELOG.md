@@ -1,18 +1,12 @@
 # Change Log
 
-## [Unreleased](https://github.com/SLAMon/slamon-jbpm/tree/HEAD)
-
-[Full Changelog](https://github.com/SLAMon/slamon-jbpm/compare/0.10.0...HEAD)
+## [0.11.0](https://github.com/SLAMon/slamon-jbpm/tree/0.11.0) (2016-09-19)
+[Full Changelog](https://github.com/SLAMon/slamon-jbpm/compare/0.10.0...0.11.0)
 
 **Implemented enhancements:**
 
 - StatsD integration [\#6](https://github.com/SLAMon/slamon-jbpm/pull/6) ([jjonek](https://github.com/jjonek))
 - Config options [\#5](https://github.com/SLAMon/slamon-jbpm/pull/5) ([jjonek](https://github.com/jjonek))
-
-**Merged pull requests:**
-
-- Switch to single branch mode [\#7](https://github.com/SLAMon/slamon-jbpm/pull/7) ([jjonek](https://github.com/jjonek))
-- Bintray publishing script [\#4](https://github.com/SLAMon/slamon-jbpm/pull/4) ([jjonek](https://github.com/jjonek))
 - Verbose logging with FINE and FINER log levels. [\#3](https://github.com/SLAMon/slamon-jbpm/pull/3) ([jjonek](https://github.com/jjonek))
 
 ## [0.10.0](https://github.com/SLAMon/slamon-jbpm/tree/0.10.0) (2015-09-03)
